@@ -29,8 +29,10 @@ class Database:
             password = os.environ.get("MONGODB_PASSWORD")
             ip = os.environ.get("MONGODB_IP")
             db = os.environ.get("MONGODB_DBNAME")
-            client = MongoClient(
-                f"mongodb+srv://{username}:{password}@{ip}/{db}?retryWrites=true&w=majority")
+            url = f"mongodb+srv://{username}:{password}@{ip}/{db}?retryWrites=true&w=majority"
+            print(url)
+            client = MongoClient(url
+                )
             self.db = client.get_database("SlideDeck")
 
     def check_user_exists(self, name):
