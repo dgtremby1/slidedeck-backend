@@ -39,7 +39,7 @@ def after_request(response):
 class Login(Resource):
     def put(self):
         request_json = request.get_json()
-        name = request_json["name"]
+        name = request_json["username"]
         password = request_json["password"]
         if api.db.check_user_exists(name):
             result, user = api.db.check_password(name, password)
@@ -48,7 +48,7 @@ class Login(Resource):
                         "result": result,
                         "user": {
                                 "role": user["role"],
-                                "name": user["name"],
+                                "username": user["username"],
                                 "token": api.db.create_token(api.token_timeout, user["id"])
                                 }
                         }
