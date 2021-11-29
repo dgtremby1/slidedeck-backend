@@ -28,9 +28,8 @@ class Database:
             username = os.environ.get("MONGODB_USERNAME")
             password = os.environ.get("MONGODB_PASSWORD")
             ip = os.environ.get("MONGODB_IP")
-            db = os.environ.get("MONGODB_DBNAME")
-            url = f"mongodb+srv://{username}:{password}@{ip}/{db}?retryWrites=true&w=majority"
-            print(url)
+            db_name = os.environ.get("MONGODB_DBNAME")
+            url = f"mongodb+srv://{username}:{password}@{ip}/{db_name}?retryWrites=true&w=majority"
             client = MongoClient(url)
             self.db = client.get_database("SlideDeck")
             print(self.create_signup_code(3, "admin"))
