@@ -35,7 +35,7 @@ class Database:
             print(self.create_signup_code(3, "admin"))
 
     def check_user_exists(self, name):
-        count = self.db.users.count_documents({"name": name})
+        count = self.db.users.count_documents({"username": name})
         if count > 0:
             return True
         else:
@@ -65,7 +65,7 @@ class Database:
                 return False
 
     def check_password(self, name, password):
-        user = self.db.users.find_one({"name": name})
+        user = self.db.users.find_one({"username": name})
         if not user:
             return False, None
         result = hmac.compare_digest(
