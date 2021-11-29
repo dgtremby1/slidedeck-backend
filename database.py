@@ -25,9 +25,12 @@ class Database:
             #                      password=os.environ.get("MONGODB_PASSWORD"),
             #                      authSource=os.environ.get("MONGODB_DBNAME"),
             #                      authMechanism="SCRAM-SHA-1")
+            username = os.environ.get("MONGODB_USERNAME")
             password = os.environ.get("MONGODB_PASSWORD")
+            ip = os.environ.get("MONGODB_IP")
+            db = os.environ.get("MONGODB_DBNAME")
             client = MongoClient(
-                f"mongodb+srv://slidedeck-admin:{password}@slidedeck-cluster.uqekc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+                f"mongodb+srv://{username}:{password}@{ip}/{db}?retryWrites=true&w=majority")
             self.db = client.get_database("SlideDeck")
 
     def check_user_exists(self, name):
