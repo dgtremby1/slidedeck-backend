@@ -68,6 +68,7 @@ class Register(Resource):
         email = request_json["email"]
         signature = request_json["signature"]
         check = api.db.check_user_exists(username)
+        print(check)
         if check:
             return {"result": False}
         else:

@@ -122,7 +122,7 @@ class Database:
             return None
         if code_object is None:
             return None
-        elif datetime.datetime.now() - code_object["created"] < datetime.timedelta(seconds=code_object["timeout"]):
+        elif datetime.datetime.now() - code_object["created"] < datetime.timedelta(hours=code_object["timeout"]):
             role = code_object["role"]
             self.db.codes.delete_one({"code": code})
             return role
