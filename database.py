@@ -41,7 +41,7 @@ class Database:
         else:
             return False
 
-    def create_user(self, username, password, name, email, signature, code):
+    def create_user(self, username, password, name, email, code):
         role = self.check_signup_code(code)
         if role is None:
             return False
@@ -56,7 +56,6 @@ class Database:
                     "id": uuid.uuid4().hex,
                     "name": name,
                     "email": email,
-                    "signature": signature,
                     "role": role
                 })
                 return True
@@ -241,6 +240,7 @@ class Database:
             log_slides.append(slide["id"])
             self.db.logs.update_one({"id": log_id}, {"$set": {"slides": log_slides}})
             self.db.slides.insert_one(slide)
+            slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
             return slide
 
     def edit_slide(self, slide_id, fields, submit, user):
@@ -267,6 +267,7 @@ class Database:
         if slide is None:
             return http.HTTPStatus.BAD_REQUEST
         else:
+            slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
             return slide
 
     def get_slides(self, log_id):
@@ -276,6 +277,7 @@ class Database:
         for slide_id in slide_ids:
             slide = self.db.slides.find_one({"id": slide_id})
             if slide:
+                slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
                 slides.append(slide)
         return slides
 

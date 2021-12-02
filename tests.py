@@ -53,12 +53,12 @@ class ADatabaseTests(unittest.TestCase):
     def test_h_create_template(self):
         template = db.create_template("test", [{"title":"test1", "type":"string", "role":"tech"}, {"title":"test2", "type":"string", "role":"doc"}])
         self.assertEqual(template["name"], "test")
-        self.assertEqual(template["headers"], {"test1": ["string", "tech"], "test2": ["string", "doc"]})
+        self.assertEqual(template["headers"], [("test1", ["string", "tech"]), ("test2", ["string", "doc"])])
     def test_i_get_templates_two(self):
         self.assertIsNot(db.get_templates(), [])
         templates = db.get_templates()
         self.assertEqual(templates[0]["name"], "test")
-        self.assertEqual(templates[0]["headers"], {"test1": ["string", "tech"], "test2": ["string", "doc"]})
+        self.assertEqual(templates[0]["headers"], [("test1", ["string", "tech"]), ("test2", ["string", "doc"])])
     def test_j_get_tests_one(self):
         self.assertEqual(db.get_tests(), [])
     def test_k_create_test(self):
