@@ -140,6 +140,7 @@ class Database:
             template["headers"][column["title"]] = [column["type"], column["role"]]
         try:
             self.db.templates.insert_one(template)
+            template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
             return template
         except:
             return http.HTTPStatus.INTERNAL_SERVER_ERROR
@@ -147,11 +148,14 @@ class Database:
     def get_templates(self):
         templates = []
         for template in self.db.templates.find():
+            template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
             templates.append(template)
         return templates
 
     def get_template(self, template_id):
         template = self.db.templates.find_one({"id": template_id})
+        if template:
+            template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
         return template
 
     def create_test(self, name, template_id, fields):
