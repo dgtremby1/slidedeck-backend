@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import datetime
 import uuid
+from export import export_log_date
 
 from pymongo import MongoClient
 
@@ -62,6 +63,19 @@ class Database:
             except Exception as e:
                 print(e)
                 return False
+
+    def get_all_users(self):
+        users = []
+        for user in self.db.users.find():
+            users.append(user)
+        return users
+
+    def delete_user(self, username):
+        if self.check_user_exists():
+            self.db.users.delete_one({"username": username})
+            return True
+        else:
+            return False
 
     def check_password(self, name, password):
         user = self.db.users.find_one({"username": name})
@@ -156,6 +170,18 @@ class Database:
         if template:
             template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
         return template
+
+    def filter_slides_by_date_log(self, date, log):
+        log = self.db.logs.find_one({"name": log})
+        if not log:
+            return None, None, None
+        template = self.get_template(log["template"])
+        slides = self.get_slides(log["id"])
+        filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"]) - date == 0]
+        url = export_log_date(self.db, log["id"], date)
+        return template["headers"], filtered_slides, url
+
+
 
     def create_test(self, name, template_id, fields):
         test = {

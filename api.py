@@ -1,17 +1,25 @@
 import http
-from flask import Flask, request, abort
+from flask import Flask, request, abort, make_response
+from flask.json import dumps
 from flask_restful import Resource, Api
 import database
 import os
 import sys
 from bson import json_util
 import json
-
+import datetime
 import export
 
 ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask("__name__")
 api = Api(app)
+
+
+@api.representation("application/octet-stream")
+def output_file(data, code, headers=None):
+    response = make_response(dumps({'response': data}), code)
+    response.headers.extend(headers or {})
+    return response
 
 
 def connect_db(test):
@@ -186,6 +194,20 @@ class LogSlideGet(Resource):
             except:
                 return http.HTTPStatus.BAD_REQUEST
 
+class LogSlideGet(Resource):
+    def get(self):
+        token = request.args["token"]
+        user = api.db.check_token(token)
+        if user is None:
+            abort(403, "bad token")
+        else:
+            name = request.args["name"]
+            date = datetime.date(int(request.args["year"]), int(request.args["month"]), int(request.args["day"]))
+            headers, slides, url = api.db.filter_slides_by_date_log(date, name)
+            if not headers or not slides or not url:
+                abort(400, "bad request")
+            return {"result": {"headers": parse_json(headers), "slides": parse_json(slides), "url": url}}
+
 
 class PostSlide(Resource):
     def post(self, log_id):
@@ -263,6 +285,7 @@ class SignupCode(Resource):
         token = request.args["token"]
         length = request.args["expiration_length"]
         role = request.args["role"]
+        email = request.args["email"]
         user = api.db.check_token(token)
         if user is None:
             abort(403, "bad token")
@@ -271,6 +294,27 @@ class SignupCode(Resource):
         else:
             signup_code = api.db.create_signup_code(length*60*60, role)
             return signup_code
+
+class AllUsers(Resource):
+    def get(self):
+        token = request.args["token"]
+        user = api.db.check_token(token)
+        if user is None:
+            abort(403, "bad token")
+        else:
+            return {"result": parse_json(api.db.get_all_users)}
+
+
+class DeleteUser(Resource):
+    def delete(self):
+        token = request.args["token"]
+        user = api.db.check_token(token)
+        username = request.args["username"]
+        if user is None:
+            abort(403, "bad token")
+        else:
+            return {"result": api.db.delete_user(username)}
+
 
 class ExportLog(Resource):
     def get(self, log_id):
@@ -282,10 +326,13 @@ class ExportLog(Resource):
             export.export_log(api.db, log_id)
             return http.HTTPStatus.OK
 
+
 api.add_resource(Login, "/login")
 api.add_resource(Register, "/register")
 api.add_resource(Token, "/token")
 api.add_resource(SignupCode, "/signup")
+api.add_resource(DeleteUser, "/users/delete")
+api.add_resource(AllUsers, "/users")
 
 api.add_resource(TemplateList, "/templates/")
 api.add_resource(Template, "/templates/<string:template_id>/")
