@@ -9,6 +9,7 @@ from bson import json_util
 import json
 import datetime
 import export
+from notifications import Notifier
 
 ASSETS_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask("__name__")
@@ -26,10 +27,11 @@ def connect_db(test):
     if test:
         api.db = database.Database(True)
         api.token_timeout = 60
+
     else:
         api.db = database.Database()
         api.token_timeout = int(os.environ.get("TOKEN_TIMEOUT"))
-        print(api.token_timeout)
+        api.notifier = Notifier()
 
 
 def parse_json(data):
@@ -53,15 +55,15 @@ class Login(Resource):
             result, user = api.db.check_password(name, password)
             if result:
                 return {
-                        "result": result,
-                        "user": {
-                                "role": user["role"],
-                                "username": user["username"],
-                                "name": user["name"],
-                                "email": user["email"],
-                                "token": api.db.create_token(api.token_timeout, user["id"])
-                                }
-                        }
+                    "result": result,
+                    "user": {
+                        "role": user["role"],
+                        "username": user["username"],
+                        "name": user["name"],
+                        "email": user["email"],
+                        "token": api.db.create_token(api.token_timeout, user["id"])
+                    }
+                }
             else:
                 return {"result": False}
         else:
@@ -206,6 +208,7 @@ class LogSlideGet(Resource):
             except:
                 return http.HTTPStatus.BAD_REQUEST
 
+
 class LogSlideGet(Resource):
     def get(self):
         token = request.args["token"]
@@ -231,7 +234,7 @@ class PostSlide(Resource):
         else:
             try:
                 slide = api.db.post_slide(log_id, request_json["fields"], request_json["submit"], user)
-                return{"result": parse_json(slide)} if slide is not None else http.HTTPStatus.INTERNAL_SERVER_ERROR
+                return {"result": parse_json(slide)} if slide is not None else http.HTTPStatus.INTERNAL_SERVER_ERROR
             except KeyError as e:
                 return abort(400, "bad params")
 
@@ -260,6 +263,7 @@ class Template(Resource):
         user = api.db.check_token(token)
         if user is None:
             abort(403, "bad token")
+
     def get(self, template_id):
         token = request.args["token"]
         user = api.db.check_token(token)
@@ -304,8 +308,11 @@ class SignupCode(Resource):
         if user["role"] != "admin":
             return http.HTTPStatus.FORBIDDEN()
         else:
-            signup_code = api.db.create_signup_code(length*60*60, role)
+            signup_code = api.db.create_signup_code(length * 60 * 60, role)
+            msg = f"You've been invited to slidedeck! Go to slidedeck-frontend.herokuapp.com/register and use code: {signup_code} to create an account!"
+            api.notifier.email(msg, "You've been invited to slidedeck", email)
             return signup_code
+
 
 class AllUsers(Resource):
     def get(self):
@@ -325,8 +332,8 @@ class DeleteUser(Resource):
         if user is None:
             abort(403, "bad token")
         else:
-           result =api.db.delete_user(username)
-           return http.HTTPStatus.OK if result else http.HTTPStatus.BAD_REQUEST
+            result = api.db.delete_user(username)
+            return http.HTTPStatus.OK if result else http.HTTPStatus.BAD_REQUEST
 
 
 class ExportLog(Resource):
@@ -360,13 +367,12 @@ api.add_resource(LogSlideGet, "/logs/<string:log_id>/slides/")
 api.add_resource(PostSlide, "/logs/<string:log_id>/slides/create")
 api.add_resource(EditSlide, "/logs/<string:log_id>/slides/edit")
 
-
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         connect_db(True)
     else:
         connect_db(False)
     # context = ('server.crt', 'server.key')
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT")))#, ssl_context=context)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT")))  # , ssl_context=context)
 else:
     connect_db(False)
