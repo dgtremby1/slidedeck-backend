@@ -49,6 +49,8 @@ class Login(Resource):
                         "user": {
                                 "role": user["role"],
                                 "username": user["username"],
+                                "name": user["name"],
+                                "email": user["email"],
                                 "token": api.db.create_token(api.token_timeout, user["id"])
                                 }
                         }
