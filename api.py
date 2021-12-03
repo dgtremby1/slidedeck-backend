@@ -313,7 +313,8 @@ class DeleteUser(Resource):
         if user is None:
             abort(403, "bad token")
         else:
-            return {"result": api.db.delete_user(username)}
+           result =api.db.delete_user(username)
+           return http.HTTPStatus.OK if result else http.HTTPStatus.BAD_REQUEST
 
 
 class ExportLog(Resource):
@@ -331,8 +332,8 @@ api.add_resource(Login, "/login")
 api.add_resource(Register, "/register")
 api.add_resource(Token, "/token")
 api.add_resource(SignupCode, "/signup")
-api.add_resource(DeleteUser, "/users/delete")
-api.add_resource(AllUsers, "/users")
+api.add_resource(DeleteUser, "/users/delete/")
+api.add_resource(AllUsers, "/users/")
 
 api.add_resource(TemplateList, "/templates/")
 api.add_resource(Template, "/templates/<string:template_id>/")

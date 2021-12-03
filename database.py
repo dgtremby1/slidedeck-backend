@@ -67,7 +67,12 @@ class Database:
     def get_all_users(self):
         users = []
         for user in self.db.users.find():
-            users.append(user)
+            users.append({"user": {
+                          "role": user["role"],
+                          "username": user["username"],
+                          "name": user["name"],
+                          "email": user["email"],
+                           }})
         return users
 
     def delete_user(self, username):
