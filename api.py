@@ -31,7 +31,7 @@ def connect_db(test):
     else:
         api.db = database.Database()
         api.token_timeout = int(os.environ.get("TOKEN_TIMEOUT"))
-        api.notifier = Notifier()
+        #api.notifier = Notifier()
 
 
 def parse_json(data):
@@ -310,7 +310,7 @@ class SignupCode(Resource):
         else:
             signup_code = api.db.create_signup_code(length * 60 * 60, role)
             msg = f"You've been invited to slidedeck! Go to slidedeck-frontend.herokuapp.com/register and use code: {signup_code} to create an account!"
-            api.notifier.email(msg, "You've been invited to slidedeck", email)
+            #api.notifier.email(msg, "You've been invited to slidedeck", email)
             return signup_code
 
 
