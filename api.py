@@ -77,12 +77,24 @@ class Register(Resource):
         name = request_json["full_name"]
         email = request_json["email"]
         check = api.db.check_user_exists(username)
-        print(check)
         if check:
             return {"result": False}
         else:
             result = api.db.create_user(username, password, name, email, code)
-            return {"result": result}
+            if result:
+                result, user = api.db.check_password(username, password)
+                return {
+                    "result": result,
+                    "user": {
+                        "role": user["role"],
+                        "username": user["username"],
+                        "name": user["name"],
+                        "email": user["email"],
+                        "token": api.db.create_token(api.token_timeout, user["id"])
+                    }
+                }
+            else:
+                return {"result": False}
 
 
 class TemplateCreate(Resource):
