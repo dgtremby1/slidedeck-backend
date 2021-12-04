@@ -54,7 +54,7 @@ class Exporter:
         for i, slide in enumerate(filtered_slides):
             for j, key in enumerate(template_headers):
                 worksheet.cell(2+i, j+1, slide["fields"][key])
-        file_name = f"{log['name']-date.isoformat()}"
+        file_name = f"{log['name']}-{date.isoformat()}"
         workbook.save(file_name+".xlsx")
         if not self.test:
             try:
