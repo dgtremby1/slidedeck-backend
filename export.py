@@ -59,7 +59,7 @@ class Exporter:
             file_name = f"{log['name'].replace(' ', '_')}.xlsx"
             workbook.save(file_name)
             files.append(file_name)
-        backup_file_name = f"{datetime.date.today().isoformat()}-all-logs.zip"
+        backup_file_name = f"all_logs.zip"
         with ZipFile(backup_file_name, 'w') as backup:
             for file in files:
                 backup.write(file)
