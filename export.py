@@ -13,7 +13,7 @@ class Exporter:
     def __init__(self, test):
         boto_config = Config(
             region_name='us-east-1',
-            signature_version='v4',
+            signature_version='s3v4',
             retries={
                 'max_attempts': 10,
                 'mode': 'standard'
