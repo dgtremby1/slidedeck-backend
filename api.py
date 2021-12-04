@@ -301,7 +301,7 @@ class SignupCode(Resource):
         token = request.args["token"]
         length = request.args["expiration_length"]
         role = request.args["role"]
-        email = request.args["email"]
+        #email = request.args["email"]
         user = api.db.check_token(token)
         if user is None:
             abort(403, "bad token")
