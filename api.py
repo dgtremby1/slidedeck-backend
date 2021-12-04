@@ -334,6 +334,7 @@ class ExportLog(Resource):
             api.exporter.export_log(api.db, log_id)
             return http.HTTPStatus.OK
 
+
 class ExportLogDate(Resource):
     def get(self):
         request_json = request.get_json()
