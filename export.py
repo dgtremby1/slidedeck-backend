@@ -32,7 +32,7 @@ class Exporter:
         template_headers = template["headers"].keys()
         slides = database.get_slides_internal(log_id)
         workbook = openpyxl.Workbook()
-        clean_name = log['name'].replace(' ', '_').replace('\\', '-')
+        clean_name = log['name'].replace(' ', '_').replace('\\', '-').replace("/", "-")
         worksheet = workbook.active
         worksheet.title = clean_name
         for i, key in enumerate(template_headers):
@@ -50,7 +50,7 @@ class Exporter:
             template_headers = template["headers"].keys()
             slides = database.get_slides_internal(log["id"])
             workbook = openpyxl.Workbook()
-            clean_name = log['name'].replace(' ', '_').replace('\\', '-')
+            clean_name = log['name'].replace(' ', '_').replace('\\', '-').replace("/", "-")
             worksheet = workbook.active
             worksheet.title = clean_name
             for i, key in enumerate(template_headers):
@@ -83,7 +83,7 @@ class Exporter:
         slides = database.get_slides_internal(log_id)
         filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"][:10]) == date]
         filtered_slides = [slide for slide in filtered_slides if slide["submitted"]]
-        clean_name = log['name'].replace(' ', '_').replace('\\', '-')
+        clean_name = log['name'].replace(' ', '_').replace('\\', '-').replace("/", "-")
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
         worksheet.title = clean_name
