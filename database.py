@@ -306,7 +306,8 @@ class Database:
                         valid_fields[key] = fields[key]
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"fields": valid_fields}})
                 return True
-            except:
+            except Exception as e:
+                print(e)
                 return False
 
     def get_slide(self, slide_id):
