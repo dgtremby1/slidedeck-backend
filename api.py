@@ -296,7 +296,7 @@ class SignupCode(Resource):
         if user["role"] != "admin":
             return http.HTTPStatus.FORBIDDEN()
         else:
-            signup_code = api.db.create_signup_code(length * 60 * 60, role)
+            signup_code = api.db.create_signup_code(length, role)
             msg = f"You've been invited to slidedeck! Go to slidedeck-frontend.herokuapp.com/register and use code: {signup_code} to create an account!"
             #api.notifier.email(msg, "You've been invited to slidedeck", email)
             return signup_code

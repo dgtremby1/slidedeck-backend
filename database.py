@@ -121,7 +121,7 @@ class Database:
             return None
         if token_obj is None:
             return None
-        elif datetime.datetime.now() - token_obj["last_used"] < datetime.timedelta(seconds=token_obj["timeout"]):
+        elif datetime.datetime.now() - token_obj["last_used"] < datetime.timedelta(hours=token_obj["timeout"]):
             self.db.tokens.update_one(
                 {"token": bytes.fromhex(token)},
                 {"$set": {"last_used": datetime.datetime.now()}}
