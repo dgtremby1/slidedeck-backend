@@ -358,4 +358,7 @@ class Database:
         return True
 
     def get_backup(self):
-        return self.db.backups.find_one()
+        backup = self.db.backups.find_one()
+        if backup is None:
+            return None, None
+        return backup["url"], backup["date"]

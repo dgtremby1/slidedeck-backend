@@ -381,7 +381,11 @@ class GetBackup(Resource):
         user = api.db.check_token(token)
         if user is None:
             abort(403, "bad token")
-        return {"result": api.db.get_backup}
+        url, date = api.db.get_backup
+        if url is None:
+            return {"result": None}
+        return {"result": {"url": url, "date": date}}
+
 api.add_resource(Login, "/login")
 api.add_resource(Register, "/register")
 api.add_resource(Token, "/token")
