@@ -59,7 +59,7 @@ class Exporter:
         if not self.test:
             try:
                 response = self.client.upload_file(file_name, self.bucket, file_name)
-                os.remove(file_name+".xlsx")
+                os.remove(file_name)
             except ClientError as e:
                 print(e)
                 return None
