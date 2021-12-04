@@ -49,14 +49,15 @@ class Exporter:
             template_headers = template["headers"].keys()
             slides = database.get_slides_internal(log["id"])
             workbook = openpyxl.Workbook()
+            clean_name = log['name'].replace(' ', '_').replace('\\', '-')
             worksheet = workbook.active
-            worksheet.title = log["name"]
+            worksheet.title = clean_name
             for i, key in enumerate(template_headers):
                 worksheet.cell(1, i + 1, key)
             for i, slide in enumerate(slides):
                 for j, key in enumerate(template_headers):
                     worksheet.cell(2 + i, j + 1, slide["fields"][key])
-            file_name = f"{log['name'].replace(' ', '_')}.xlsx"
+            file_name = f"{clean_name}.xlsx"
             workbook.save(file_name)
             files.append(file_name)
         backup_file_name = f"all_logs.zip"
