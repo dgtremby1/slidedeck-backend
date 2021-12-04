@@ -54,11 +54,11 @@ class Exporter:
         for i, slide in enumerate(filtered_slides):
             for j, key in enumerate(template_headers):
                 worksheet.cell(2+i, j+1, slide["fields"][key])
-        file_name = f"{log['name'].replace(' ', '_')}-{date.isoformat()}"
-        workbook.save(file_name+".xlsx")
+        file_name = f"{log['name'].replace(' ', '_')}-{date.isoformat()}.xlsx"
+        workbook.save(file_name)
         if not self.test:
             try:
-                response = self.client.upload_file(file_name+".xlsx", self.bucket, file_name)
+                response = self.client.upload_file(file_name, self.bucket, file_name)
                 os.remove(file_name+".xlsx")
             except ClientError as e:
                 print(e)
