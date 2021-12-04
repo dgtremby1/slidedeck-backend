@@ -293,7 +293,7 @@ class Database:
     def edit_slide(self, slide_id, fields, submit, user):
         slide = self.db.slides.find_one({"id": slide_id})
         if slide is None:
-            return http.HTTPStatus.BAD_REQUEST
+            return None
         else:
             if not slide["submitted"] and submit:
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"submitted": submit}})
@@ -305,10 +305,12 @@ class Database:
                     if user["role"] == "admin" or headers[key][1] == user["role"]:
                         valid_fields[key] = fields[key]
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"fields": valid_fields}})
-                return True
+                slide = self.db.slides.find_one({"id": slide_id})
+                slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
+                return slide
             except Exception as e:
                 print(e)
-                return False
+                return None
 
     def get_slide(self, slide_id):
         slide = self.db.slides.find_one({"id": slide_id})

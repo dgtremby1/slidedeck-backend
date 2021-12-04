@@ -238,7 +238,7 @@ class EditSlide(Resource):
             try:
                 result = api.db.edit_slide(request_json["slide"], request_json["fields"], request_json["submit"], user)
                 if result:
-                    return http.HTTPStatus.OK
+                    return {"result": result}
                 else:
                     return http.HTTPStatus.BAD_REQUEST
             except KeyError as e:
