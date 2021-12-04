@@ -71,7 +71,7 @@ class Exporter:
             except ClientError as e:
                 return False
                 print(e)
-        return True
+        return f"https://{self.bucket}.s3.amazonaws.com/{backup_file_name}"
 
 
     def export_log_date(self, database, log_id, date):

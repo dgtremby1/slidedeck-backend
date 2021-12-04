@@ -312,6 +312,18 @@ class AllUsers(Resource):
             return {"result": parse_json(api.db.get_all_users)}
 
 
+class ChangePassword(Resource):
+    def put(self):
+        request_json = request.get_json()
+        token = request_json["token"]
+        user = api.db.check_token(token)
+        new_password = request.args["new_password"]
+        if user is None:
+            abort(403, "bad token")
+        else:
+            return {"result": api.db.change_password(user, new_password)}
+
+
 class DeleteUser(Resource):
     def delete(self):
         token = request.args["token"]
@@ -351,20 +363,32 @@ class ExportLogDate(Resource):
                 abort(400, "bad request")
             return {"result": {"headers": parse_json(headers), "slides":parse_json(slides), "url": url}}
 
+
 class BackupLogs(Resource):
     def get(self):
         token = request.args["token"]
         user = api.db.check_token(token)
         if user is None:
             abort(403, "bad token")
-        api.exporter.export_all_logs(api.db)
+        url = api.exporter.export_all_logs(api.db)
+        api.db.put_backup(url)
+        return {"result": url}
 
+
+class GetBackup(Resource):
+    def get(self):
+        token = request.args["token"]
+        user = api.db.check_token(token)
+        if user is None:
+            abort(403, "bad token")
+        return {"result": api.db.get_backup}
 api.add_resource(Login, "/login")
 api.add_resource(Register, "/register")
 api.add_resource(Token, "/token")
 api.add_resource(SignupCode, "/signup")
 api.add_resource(DeleteUser, "/users/delete/")
 api.add_resource(AllUsers, "/users/")
+api.add_resource(ChangePassword, "/password")
 
 api.add_resource(TemplateList, "/templates/")
 api.add_resource(Template, "/templates/<string:template_id>/")
@@ -379,7 +403,9 @@ api.add_resource(LogSlideGet, "/logs/<string:log_id>/slides/")
 api.add_resource(PostSlide, "/logs/<string:log_id>/slides/create")
 api.add_resource(EditSlide, "/logs/<string:log_id>/slides/edit")
 api.add_resource(ExportLogDate, "/log/export")
-api.add_resource(BackupLogs, "/backup/")
+api.add_resource(BackupLogs, "/backup/create/")
+api.add_resource(GetBackup, "/backup/current/")
+
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         connect_db(True)

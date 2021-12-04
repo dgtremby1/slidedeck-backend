@@ -64,6 +64,16 @@ class Database:
                 print(e)
                 return False
 
+    def change_password(self, user, new_password):
+        user = self.db.users.find_one({"id": user["id"]})
+        if user is None:
+            return False
+        salt = os.urandom(16)
+        password_hash = hashlib.pbkdf2_hmac("sha512", new_password.encode(), salt, 100000)
+        self.db.users.update_one({"id": user["id"]}, {"$set": {"salt": salt}})
+        self.db.users.update_one({"id": user["id"]}, {"$set": {"hash": password_hash}})
+        return True
+
     def get_all_users(self):
         users = []
         for user in self.db.users.find():
@@ -335,3 +345,17 @@ class Database:
             return True
         else:
             return False
+
+    def put_backup(self, url):
+        date = datetime.date.today().isoformat()
+        existing_backup = self.db.backups.find_one()
+        if existing_backup is None:
+            backup = {"id": uuid.uuid4().hex, "url": url, "date": date}
+            self.db.backups.insert_one(backup)
+        else:
+            self.db.backups.update_one({"id": existing_backup["id"]}, {"$set": {"url": url}})
+            self.db.backups.update_one({"id": existing_backup["id"]}, {"$set": {"date": date}})
+        return True
+
+    def get_backup(self):
+        return self.db.backups.find_one()
