@@ -41,9 +41,9 @@ class Exporter:
 
     def export_log_date(self, database, log_id, date):
         log = database.get_log(log_id)
-        template = database.get_template(log["template"])
+        template = database.get_template_internal(log["template"])
         template_headers = template["headers"].keys()
-        slides = database.get_slides(log_id)
+        slides = database.get_slides_internal(log_id)
         filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"][:10]) - date == 0]
         filtered_slides = [slide for slide in filtered_slides if slide["submitted"]]
         workbook = openpyxl.Workbook()

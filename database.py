@@ -176,6 +176,11 @@ class Database:
             template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
         return template
 
+    def get_template_internal(self, template_id):
+        template = self.db.templates.find_one({"id": template_id})
+        if template:
+            return template
+
     def filter_slides_by_date_log(self, date, log, exporter):
         log = self.db.logs.find_one({"name": log})
         if not log:
@@ -309,6 +314,16 @@ class Database:
             slide = self.db.slides.find_one({"id": slide_id})
             if slide:
                 slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
+                slides.append(slide)
+        return slides
+
+    def get_slides_internal(self, log_id):
+        log = self.db.logs.find_one({"id": log_id})
+        slide_ids = log["slides"]
+        slides = []
+        for slide_id in slide_ids:
+            slide = self.db.slides.find_one({"id": slide_id})
+            if slide:
                 slides.append(slide)
         return slides
 
