@@ -347,8 +347,9 @@ class ExportLogDate(Resource):
         else:
             headers, slides, url = api.db.filter_slides_by_date_log(date, log_name, api.exporter)
             if not headers or not slides or not url:
+                print(headers, slides, url)
                 abort(400, "bad request")
-            return {"result": {"headers":parse_json(headers), "slides":parse_json(slides), "url": url}}
+            return {"result": {"headers": parse_json(headers), "slides":parse_json(slides), "url": url}}
 
 
 api.add_resource(Login, "/login")
