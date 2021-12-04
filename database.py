@@ -295,7 +295,7 @@ class Database:
         if slide is None:
             return None
         else:
-            if not slide["submitted"] and submit:
+            if slide["submitted"] != submit:
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"submitted": submit}})
             try:
                 log = self.db.logs.find_one({"id": slide["log"]})
