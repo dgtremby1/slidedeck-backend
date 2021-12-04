@@ -182,7 +182,7 @@ class Database:
             return None, None, None
         template = self.get_template(log["template"])
         slides = self.get_slides(log["id"])
-        filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"]) - date == 0]
+        filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"][:10]) - date == 0]
         url = exporter.export_log_date(self.db, log["id"], date)
         return template["headers"], filtered_slides, url
 

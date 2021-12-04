@@ -44,7 +44,7 @@ class Exporter:
         template = database.get_template(log["template"])
         template_headers = template["headers"].keys()
         slides = database.get_slides(log_id)
-        filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"]) - date == 0]
+        filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"][:10]) - date == 0]
         filtered_slides = [slide for slide in filtered_slides if slide["submitted"]]
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
