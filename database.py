@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import datetime
 import uuid
-from export import export_log_date
+
 
 from pymongo import MongoClient
 
@@ -176,14 +176,14 @@ class Database:
             template["headers"] = [*zip(template["headers"].keys(), template["headers"].values())]
         return template
 
-    def filter_slides_by_date_log(self, date, log):
+    def filter_slides_by_date_log(self, date, log, exporter):
         log = self.db.logs.find_one({"name": log})
         if not log:
             return None, None, None
         template = self.get_template(log["template"])
         slides = self.get_slides(log["id"])
         filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"]) - date == 0]
-        url = export_log_date(self.db, log["id"], date)
+        url = exporter.export_log_date(self.db, log["id"], date)
         return template["headers"], filtered_slides, url
 
 

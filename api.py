@@ -27,10 +27,12 @@ def connect_db(test):
     if test:
         api.db = database.Database(True)
         api.token_timeout = 60
+        api.exporter = export.Exporter(True)
 
     else:
         api.db = database.Database()
         api.token_timeout = int(os.environ.get("TOKEN_TIMEOUT"))
+        api.exporter = export.Exporter(False)
         #api.notifier = Notifier()
 
 
@@ -209,20 +211,6 @@ class LogSlideGet(Resource):
                 return http.HTTPStatus.BAD_REQUEST
 
 
-class LogSlideGet(Resource):
-    def get(self):
-        token = request.args["token"]
-        user = api.db.check_token(token)
-        if user is None:
-            abort(403, "bad token")
-        else:
-            name = request.args["name"]
-            date = datetime.date(int(request.args["year"]), int(request.args["month"]), int(request.args["day"]))
-            headers, slides, url = api.db.filter_slides_by_date_log(date, name)
-            if not headers or not slides or not url:
-                abort(400, "bad request")
-            return {"result": {"headers": parse_json(headers), "slides": parse_json(slides), "url": url}}
-
 
 class PostSlide(Resource):
     def post(self, log_id):
@@ -343,8 +331,23 @@ class ExportLog(Resource):
         if user is None:
             abort(403, "bad token")
         else:
-            export.export_log(api.db, log_id)
+            api.exporter.export_log(api.db, log_id)
             return http.HTTPStatus.OK
+
+class ExportLogDate(Resource):
+    def get(self):
+        request_json = request.get_json()
+        token = request_json["token"]
+        user = api.db.check_token(token)
+        date = datetime.date(request_json["year"], request_json["month"], request_json["day"])
+        log_name = request_json["log_name"]
+        if user is None:
+            abort(403, "bad token")
+        else:
+            headers, slides, url = api.db.filter_slides_by_date_log(date, log_name, api.exporter)
+            if not headers or not slides or not url:
+                abort(400, "bad request")
+            return {"result": {"headers":parse_json(headers), "slides":parse_json(slides), "url": url}}
 
 
 api.add_resource(Login, "/login")
@@ -366,7 +369,7 @@ api.add_resource(ExportLog, "/logs/<string:log_id>/export/")
 api.add_resource(LogSlideGet, "/logs/<string:log_id>/slides/")
 api.add_resource(PostSlide, "/logs/<string:log_id>/slides/create")
 api.add_resource(EditSlide, "/logs/<string:log_id>/slides/edit")
-
+api.add_resource(ExportLogDate, "/log/export")
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         connect_db(True)
