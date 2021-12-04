@@ -61,6 +61,7 @@ class Exporter:
                 response = self.client.upload_file(file_name+".xlsx", self.bucket, file_name)
                 os.remove(file_name+".xlsx")
             except ClientError as e:
+                print(e)
                 return None
             return f"https://slide-export.s3.amazonaws.com/{file_name}"
         else:
