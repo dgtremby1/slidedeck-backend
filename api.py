@@ -360,7 +360,7 @@ class ExportLogDate(Resource):
             headers, slides, url = api.db.filter_slides_by_date_log(date, log_name, api.exporter)
             if headers is None or slides is None or url is None:
                 print(headers, slides, url)
-                abort(400, "bad request")
+                abort(404, "not found")
             return {"result": {"headers": parse_json(headers), "slides":parse_json(slides), "url": url}}
 
 
