@@ -81,15 +81,15 @@ class Exporter:
         slides = database.get_slides_internal(log_id)
         filtered_slides = [slide for slide in slides if datetime.date.fromisoformat(slide["created"][:10]) == date]
         filtered_slides = [slide for slide in filtered_slides if slide["submitted"]]
+        clean_name = log['name'].replace(' ', '_').replace('\\', '-')
         workbook = openpyxl.Workbook()
         worksheet = workbook.active
-        worksheet.title = log["name"]
+        worksheet.title = clean_name
         for i, key in enumerate(template_headers):
             worksheet.cell(1, i+1, key)
         for i, slide in enumerate(filtered_slides):
             for j, key in enumerate(template_headers):
                 worksheet.cell(2+i, j+1, slide["fields"][key])
-        clean_name = log['name'].replace(' ', '_').replace('\\', '-')
         file_name = f"{clean_name}-{date.isoformat()}.xlsx"
         workbook.save(file_name)
         if not self.test:
