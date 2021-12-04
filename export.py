@@ -63,6 +63,6 @@ class Exporter:
             except ClientError as e:
                 print(e)
                 return None
-            return f"https://slide-export.s3.amazonaws.com/{file_name}"
+            return f"https://{self.bucket}.s3.amazonaws.com/{file_name}"
         else:
             return "url"
