@@ -261,7 +261,7 @@ class Database:
                 headers = self.db.templates.find_one({"id": log["template"]})["headers"]
                 valid_fields = {}
                 for key in fields.keys():
-                    if headers[key][1] == user["role"]:
+                    if user["role"] == "admin" or headers[key][1] == user["role"]:
                         valid_fields[key] = fields[key]
                     else:
                         valid_fields[key] = None
@@ -292,7 +292,7 @@ class Database:
                 headers = self.db.templates.find_one({"id": log["template"]})["headers"]
                 valid_fields = slide["fields"]
                 for key in fields.keys():
-                    if headers[key][1] == user["role"]:
+                    if user["role"] == "admin" or headers[key][1] == user["role"]:
                         valid_fields[key] = fields[key]
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"fields": valid_fields}})
                 return True

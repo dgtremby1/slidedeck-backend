@@ -351,6 +351,13 @@ class ExportLogDate(Resource):
                 abort(400, "bad request")
             return {"result": {"headers": parse_json(headers), "slides":parse_json(slides), "url": url}}
 
+class BackupLogs(Resource):
+    def get(self):
+        token = request.args["token"]
+        user = api.db.check_token(token)
+        if user is None:
+            abort(403, "bad token")
+        api.exporter.export_all_logs(api.db)
 
 api.add_resource(Login, "/login")
 api.add_resource(Register, "/register")
@@ -372,6 +379,7 @@ api.add_resource(LogSlideGet, "/logs/<string:log_id>/slides/")
 api.add_resource(PostSlide, "/logs/<string:log_id>/slides/create")
 api.add_resource(EditSlide, "/logs/<string:log_id>/slides/edit")
 api.add_resource(ExportLogDate, "/log/export")
+api.add_resource(BackupLogs, "/backup/")
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         connect_db(True)
