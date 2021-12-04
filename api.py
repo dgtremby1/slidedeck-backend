@@ -348,7 +348,7 @@ class ExportLog(Resource):
 
 
 class ExportLogDate(Resource):
-    def get(self):
+    def put(self):
         request_json = request.get_json()
         token = request_json["token"]
         user = api.db.check_token(token)
