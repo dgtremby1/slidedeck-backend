@@ -301,9 +301,9 @@ class Database:
                 log = self.db.logs.find_one({"id": slide["log"]})
                 headers = self.db.templates.find_one({"id": log["template"]})["headers"]
                 valid_fields = slide["fields"]
-                for key in fields.keys():
-                    if user["role"] == "admin" or headers[key][1] == user["role"]:
-                        valid_fields[key] = fields[key]
+                for vals in fields:
+                    if user["role"] == "admin" or headers[vals[0]][1] == user["role"]:
+                        valid_fields[vals[0]] = vals[1]
                 self.db.slides.update_one({"id": slide_id}, {"$set": {"fields": valid_fields}})
                 slide = self.db.slides.find_one({"id": slide_id})
                 slide["fields"] = [*zip(slide["fields"].keys(), slide["fields"].values())]
