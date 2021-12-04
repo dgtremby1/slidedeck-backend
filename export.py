@@ -32,8 +32,9 @@ class Exporter:
         template_headers = template["headers"].keys()
         slides = database.get_slides_internal(log_id)
         workbook = openpyxl.Workbook()
+        clean_name = log['name'].replace(' ', '_').replace('\\', '-')
         worksheet = workbook.active
-        worksheet.title = log["name"]
+        worksheet.title = clean_name
         for i, key in enumerate(template_headers):
             worksheet.cell(1, i+1, key)
         for i, slide in enumerate(slides):
