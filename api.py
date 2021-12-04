@@ -352,7 +352,7 @@ class ExportLogDate(Resource):
         request_json = request.get_json()
         token = request_json["token"]
         user = api.db.check_token(token)
-        date = datetime.date(request_json["year"], request_json["month"], request_json["day"])
+        date = datetime.date(int(request_json["year"]), int(request_json["month"]), int(request_json["day"]))
         log_name = request_json["log_name"]
         if user is None:
             abort(403, "bad token")
